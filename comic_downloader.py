@@ -13,8 +13,8 @@ from links import smbc_latest
 def get_xkcd(link):
     r = requests.get(link)
     try:
-        urls_png = re.findall('https://imgs.xkcd.com/.*png', r.text)
-        urls_jpg = re.findall('https://imgs.xkcd.com/.*jpe?g', r.text)
+        urls_png = re.findall('https?://imgs.xkcd.com/.*png', r.text)
+        urls_jpg = re.findall('https?://imgs.xkcd.com/.*jpe?g', r.text)
         img = requests.get(urls_png[0] if urls_png else urls_jpg[0])
         i = Image.open(BytesIO(img.content))
     except Exception:
@@ -23,22 +23,22 @@ def get_xkcd(link):
     try:
         text = re.findall('{{Title.*}}', r.text)
         text = html.unescape(text[0].lstrip('{{Title text:').rstrip('}}').lstrip('{{Title text: ').rstrip('}}'))
-    except IndexError:
+    except Exception:
         text = ''
     return i, text
 
 
 def get_goose(link):
     r = requests.get(link)
-    clean_url = re.findall('url=https://abstrusegoose.com/.*"', r.text)
+    clean_url = re.findall('url=https?://abstrusegoose.com/.*"', r.text)
     url = clean_url[0].lstrip('url=').rstrip('"')
     r = requests.get(url)
     try:
-        urls = re.findall('https?://abstrusegoose.com/strips/.*png', r.text.lower())
-        urls2 = re.findall('https?://abstrusegoose.com/images/.*png', r.text.lower())
-        img = requests.get(urls[0] or urls2[0])
+        urls_strips = re.findall('https?://abstrusegoose.com/strips/.*png', r.text.lower())
+        urls_images = re.findall('https?://abstrusegoose.com/images/.*png', r.text.lower())
+        img = requests.get(urls_strips[0] if urls_strips else urls_images[0])
         i = Image.open(BytesIO(img.content))
-    except IndexError:
+    except Exception:
         i = None
         logging.warning(url)
     try:
@@ -62,7 +62,7 @@ def get_poorlydrawnlines(link, latest=False):
         del list_of_comics[:15]
         url = random.choice(list_of_comics)
         r = requests.get(url)
-        urls = re.findall('http://www.poorlydrawnlines.com/wp-content/uploads/.*png', r.text)
+        urls = re.findall('https?://www.poorlydrawnlines.com/wp-content/uploads/.*png', r.text)
         try:
             img_url = urls[0].split()[0]
         except Exception:
@@ -76,9 +76,9 @@ def get_poorlydrawnlines(link, latest=False):
     return i, ''
 
 
-def get_smbc(link, latest=False):
+def get_smbc(link):
     r = requests.get(link)
-    urls = re.findall('https://www.smbc-comics.com/comics/.*p?n?gi?f?', r.text)
+    urls = re.findall('https?://www.smbc-comics.com/comics/.*p?n?gi?f?', r.text)
     try:
         txt = re.findall('img\stitle=.*id="cc-comic"', r.text)
         txt = txt[0].lstrip('img title="').split('"')[0]
@@ -97,7 +97,7 @@ def get_smbc(link, latest=False):
     return i, txt
 
 
-def get_smbc_from_archive(link, latest=False):
+def get_smbc_from_archive(link):
     all = requests.get(link)
     soup = BeautifulSoup(all.text, 'html5lib')
     list_of_comics = []

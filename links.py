@@ -5,3 +5,6 @@ poorlydrawnlines_random = 'http://www.poorlydrawnlines.com/archive/'
 poorlydrawnlines_latest = 'http://www.poorlydrawnlines.com/comic/'
 smbc_latest = 'https://www.smbc-comics.com/'
 smbc_archive = 'https://www.smbc-comics.com/comic/archive'
+exo_latest = 'https://www.exocomics.com/'
+exo_archive = 'https://www.exocomics.com/archive'
+

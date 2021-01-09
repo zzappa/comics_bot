@@ -109,3 +109,27 @@ def get_smbc_from_archive(link):
     new_link = smbc_latest + rand_clean
     img, txt = get_smbc(new_link)
     return img, txt
+
+
+def get_exo(link):
+    r = requests.get(link)
+    urls = re.findall('https?://www.exocomics.com/wp-content/uploads/.*jpg', r.text)
+    try:
+        img = requests.get(urls[0])
+        i = Image.open(BytesIO(img.content))
+    except Exception:
+        i = None
+        logging.warning(r.url)
+    return i, ''
+
+
+def get_exo_archive(link):
+    r = requests.get(link)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    list_of_comics = []
+    for link in soup.find_all('a'):
+        list_of_comics.append(link.get('href'))
+    del list_of_comics[-34:]
+    url = random.choice(list_of_comics)
+    img, txt = get_exo(url)
+    return img, txt

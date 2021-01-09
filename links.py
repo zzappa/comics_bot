@@ -1,7 +1,6 @@
 xkcd_random = 'https://c.xkcd.com/random/comic/'
 xkcd_latest = 'https://xkcd.com/'
 goose_random = 'https://abstrusegoose.com/pseudorandom.php'
-# goose_latest = 'https://abstrusegoose.com/'
 poorlydrawnlines_random = 'http://www.poorlydrawnlines.com/archive/'
 poorlydrawnlines_latest = 'http://www.poorlydrawnlines.com/comic/'
 smbc_latest = 'https://www.smbc-comics.com/'

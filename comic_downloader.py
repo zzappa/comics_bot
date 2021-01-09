@@ -14,7 +14,7 @@ def get_xkcd(link):
     r = requests.get(link)
     try:
         urls_png = re.findall('https://imgs.xkcd.com/.*png', r.text)
-        urls_jpg = re.findall('https://imgs.xkcd.com/.*jpg', r.text)
+        urls_jpg = re.findall('https://imgs.xkcd.com/.*jpe?g', r.text)
         img = requests.get(urls_png[0] if urls_png else urls_jpg[0])
         i = Image.open(BytesIO(img.content))
     except Exception:
@@ -22,7 +22,7 @@ def get_xkcd(link):
         logging.warning(r.url)
     try:
         text = re.findall('{{Title.*}}', r.text)
-        text = html.unescape(text[0].lstrip('{{Title text: ').rstrip('}}').lstrip('{{Title text: ').rstrip('}}'))
+        text = html.unescape(text[0].lstrip('{{Title text:').rstrip('}}').lstrip('{{Title text: ').rstrip('}}'))
     except IndexError:
         text = ''
     return i, text
@@ -78,7 +78,7 @@ def get_poorlydrawnlines(link, latest=False):
 
 def get_smbc(link, latest=False):
     r = requests.get(link)
-    urls = re.findall('https://www.smbc-comics.com/comics/.*png', r.text)
+    urls = re.findall('https://www.smbc-comics.com/comics/.*p?n?gi?f?', r.text)
     try:
         txt = re.findall('img\stitle=.*id="cc-comic"', r.text)
         txt = txt[0].lstrip('img title="').split('"')[0]

@@ -25,20 +25,25 @@ def get_xkcd(link):
     return i, text
 
 
-def get_goose(link, latest=False):
+def get_goose(link):
     r = requests.get(link)
-    if not latest:
-        clean_url = re.findall('url=https://abstrusegoose.com/.*"', r.text)
-        url = clean_url[0].lstrip('url=').rstrip('"')
-        r = requests.get(url)
+    clean_url = re.findall('url=https://abstrusegoose.com/.*"', r.text)
+    url = clean_url[0].lstrip('url=').rstrip('"')
+    r = requests.get(url)
     try:
         urls = re.findall('https?://abstrusegoose.com/strips/.*png', r.text.lower())
         urls2 = re.findall('https?://abstrusegoose.com/images/.*png', r.text.lower())
     except IndexError:
         return
+    try:
+        soup = BeautifulSoup(r.text, 'html5lib')
+        txt = soup.find("div", {"id": "blog_text"})
+        txt = html.unescape(str(txt).lstrip('<div id="blog_text"><p>\n<p>').rstrip('</p></div></p>\n'))
+    except Exception:
+        txt = ''
     img = requests.get(urls[0] or urls2[0])
     i = Image.open(BytesIO(img.content))
-    return i
+    return i, txt
 
 
 def get_poorlydrawnlines(link, latest=False):
@@ -57,13 +62,13 @@ def get_poorlydrawnlines(link, latest=False):
         try:
             img_url = urls[0].split()[0]
         except Exception:
-            return None
+            return None, None
     img = requests.get(img_url)
     i = Image.open(BytesIO(img.content))
-    return i
+    return i, ''
 
 
-def get_smbc(link):
+def get_smbc(link, latest=False):
     r = requests.get(link)
     urls = re.findall('https://www.smbc-comics.com/comics/.*png', r.text)
     try:
@@ -79,7 +84,7 @@ def get_smbc(link):
     return i, txt
 
 
-def get_smbc_from_archive(link):
+def get_smbc_from_archive(link, latest=False):
     all = requests.get(link)
     soup = BeautifulSoup(all.text, 'html5lib')
     list_of_comics = []

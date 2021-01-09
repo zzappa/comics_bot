@@ -5,6 +5,7 @@ from PIL import Image
 from io import BytesIO
 from bs4 import BeautifulSoup
 import random
+import logging
 
 from links import smbc_latest
 
@@ -13,10 +14,11 @@ def get_xkcd(link):
     r = requests.get(link)
     try:
         urls = re.findall('https://imgs.xkcd.com/.*png', r.text)
-    except IndexError:
-        return None, None
-    img = requests.get(urls[0])
-    i = Image.open(BytesIO(img.content))
+        img = requests.get(urls[0])
+        i = Image.open(BytesIO(img.content))
+    except Exception:
+        i = None
+        logging.warning(link)
     try:
         text = re.findall('{{Title.*}}', r.text)
         text = html.unescape(text[0].lstrip('{{Title text: ').rstrip('}}').lstrip('{{Title text: ').rstrip('}}'))
@@ -33,16 +35,17 @@ def get_goose(link):
     try:
         urls = re.findall('https?://abstrusegoose.com/strips/.*png', r.text.lower())
         urls2 = re.findall('https?://abstrusegoose.com/images/.*png', r.text.lower())
+        img = requests.get(urls[0] or urls2[0])
+        i = Image.open(BytesIO(img.content))
     except IndexError:
-        return
+        i = None
+        logging.warning(url)
     try:
         soup = BeautifulSoup(r.text, 'html5lib')
         txt = soup.find("div", {"id": "blog_text"})
         txt = html.unescape(str(txt).lstrip('<div id="blog_text"><p>\n<p>').rstrip('</p></div></p>\n'))
     except Exception:
         txt = ''
-    img = requests.get(urls[0] or urls2[0])
-    i = Image.open(BytesIO(img.content))
     return i, txt
 
 
@@ -62,9 +65,13 @@ def get_poorlydrawnlines(link, latest=False):
         try:
             img_url = urls[0].split()[0]
         except Exception:
+            logging.warning(url)
             return None, None
-    img = requests.get(img_url)
-    i = Image.open(BytesIO(img.content))
+    try:
+        img = requests.get(img_url)
+        i = Image.open(BytesIO(img.content))
+    except Exception:
+        i = None
     return i, ''
 
 
@@ -78,9 +85,14 @@ def get_smbc(link, latest=False):
     except Exception:
         txt = ''
     if not urls:
+        logging.warning(link)
         return None, None
-    img = requests.get(urls[0])
-    i = Image.open(BytesIO(img.content))
+    try:
+        img = requests.get(urls[0])
+        i = Image.open(BytesIO(img.content))
+    except Exception:
+        i = None
+        logging.warning(urls[0])
     return i, txt
 
 

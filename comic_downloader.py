@@ -13,12 +13,13 @@ from links import smbc_latest
 def get_xkcd(link):
     r = requests.get(link)
     try:
-        urls = re.findall('https://imgs.xkcd.com/.*png', r.text)
-        img = requests.get(urls[0])
+        urls_png = re.findall('https://imgs.xkcd.com/.*png', r.text)
+        urls_jpg = re.findall('https://imgs.xkcd.com/.*jpg', r.text)
+        img = requests.get(urls_png[0] if urls_png else urls_jpg[0])
         i = Image.open(BytesIO(img.content))
     except Exception:
         i = None
-        logging.warning(link)
+        logging.warning(r.url)
     try:
         text = re.findall('{{Title.*}}', r.text)
         text = html.unescape(text[0].lstrip('{{Title text: ').rstrip('}}').lstrip('{{Title text: ').rstrip('}}'))

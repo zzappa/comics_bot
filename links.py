@@ -7,4 +7,5 @@ smbc_latest = 'https://www.smbc-comics.com/'
 smbc_archive = 'https://www.smbc-comics.com/comic/archive'
 exo_latest = 'https://www.exocomics.com/'
 exo_archive = 'https://www.exocomics.com/archive'
-
+tom_gauld_latest = 'https://myjetpack.tumblr.com/'
+tom_gauld_random = 'https://myjetpack.tumblr.com/random'

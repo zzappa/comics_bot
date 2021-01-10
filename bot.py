@@ -11,13 +11,15 @@ keyboard = telebot.types.InlineKeyboardMarkup()
 keyboard_small = telebot.types.InlineKeyboardMarkup()
 xkcd_random = telebot.types.InlineKeyboardButton(text='random xkcd', callback_data='xkcd_random')
 xkcd_latest = telebot.types.InlineKeyboardButton(text='latest xkcd', callback_data='xkcd_latest')
-goose_random = telebot.types.InlineKeyboardButton(text='random AbstruseGoose', callback_data='goose_random')
+goose_random = telebot.types.InlineKeyboardButton(text='random Abstruse Goose', callback_data='goose_random')
 poorlydrawnlines_random = telebot.types.InlineKeyboardButton(text='random Poorly Drawn Lines', callback_data='poorlydrawnlines_random')
 poorlydrawnlines_latest = telebot.types.InlineKeyboardButton(text='latest Poorly Drawn Lines', callback_data='poorlydrawnlines_latest')
 smbc_random = telebot.types.InlineKeyboardButton(text='random SMBC', callback_data='smbc_random')
 smbc_latest = telebot.types.InlineKeyboardButton(text='latest SMBC', callback_data='smbc_latest')
 exo_random = telebot.types.InlineKeyboardButton(text='random Extra Ordinary', callback_data='exo_random')
 exo_latest = telebot.types.InlineKeyboardButton(text='latest Extra Ordinary', callback_data='exo_latest')
+tom_gauld_random = telebot.types.InlineKeyboardButton(text='random Tom Gauld', callback_data='tom_gauld_random')
+tom_gauld_latest = telebot.types.InlineKeyboardButton(text='latest Tom Gauld', callback_data='tom_gauld_latest')
 again = telebot.types.InlineKeyboardButton(text='Yesss!', callback_data='again')
 keyboard.add(xkcd_random)
 keyboard.add(xkcd_latest)
@@ -28,6 +30,8 @@ keyboard.add(smbc_random)
 keyboard.add(smbc_latest)
 keyboard.add(exo_random)
 keyboard.add(exo_latest)
+keyboard.add(tom_gauld_random)
+keyboard.add(tom_gauld_latest)
 keyboard_small.add(again)
 
 
@@ -63,6 +67,10 @@ def callback_worker(call):
         return_comic(call, codo.get_exo_archive, links.exo_archive)
     if call.data == "exo_latest":
         return_comic(call, codo.get_exo, links.exo_latest)
+    if call.data == "tom_gauld_random":
+        return_comic(call, codo.get_tom_gauld, links.tom_gauld_random)
+    if call.data == "tom_gauld_latest":
+        return_comic(call, codo.get_tom_gauld, links.tom_gauld_latest)
     if call.data == "again":
         bot.send_message(call.message.chat.id, 'Choose wisely!', reply_markup=keyboard)
 

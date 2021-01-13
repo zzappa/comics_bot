@@ -134,14 +134,14 @@ def callback_worker(call):
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    if len(message.text) >= 1 and message.text != 'start':
+    if len(message.text) >= 1 and message.text.lower() != 'start':
         bot.send_message(message.from_user.id,
                          "Hello there! I'm TheComicBot and I can show your some comics."
                          "\nChoose a comic you want.",
                          reply_markup=keyboard)
-    elif message.text == 'start':
+    elif message.text.lower() == 'start':
         bot.send_message(message.chat.id,
-                         "Hello there! I'm TheComicBot! Do you want to get all the latest comicses?",
+                         "Hello there! I'm TheComicBot! What do you want?",
                          reply_markup=keyboard_start)
     else:
         bot.send_message(message.from_user.id, "Please try again.")

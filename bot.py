@@ -1,4 +1,5 @@
 import telebot
+import random
 
 import links
 import comic_downloader as codo
@@ -24,9 +25,12 @@ exo_random = telebot.types.InlineKeyboardButton(text='random Extra Ordinary', ca
 exo_latest = telebot.types.InlineKeyboardButton(text='latest Extra Ordinary', callback_data='exo_latest')
 tom_gauld_random = telebot.types.InlineKeyboardButton(text='random Tom Gauld', callback_data='tom_gauld_random')
 tom_gauld_latest = telebot.types.InlineKeyboardButton(text='latest Tom Gauld', callback_data='tom_gauld_latest')
+apod_random = telebot.types.InlineKeyboardButton(text='random APOD', callback_data='apod_random')
+apod_latest = telebot.types.InlineKeyboardButton(text='latest APOD', callback_data='apod_latest')
 again = telebot.types.InlineKeyboardButton(text='Yesss!', callback_data='again')
 get_all_latest = telebot.types.InlineKeyboardButton(text='Get all latest comics!', callback_data='get_all_latest')
-show_all = telebot.types.InlineKeyboardButton(text='No, show me all options.', callback_data='show_all')
+smth_random = telebot.types.InlineKeyboardButton(text='Surprise me!', callback_data='smth_random')
+show_all = telebot.types.InlineKeyboardButton(text='Nah, show me all options.', callback_data='show_all')
 start = telebot.types.InlineKeyboardButton(text='Start!', callback_data='start')
 keyboard.add(xkcd_random)
 keyboard.add(xkcd_latest)
@@ -39,8 +43,12 @@ keyboard.add(exo_random)
 keyboard.add(exo_latest)
 keyboard.add(tom_gauld_random)
 keyboard.add(tom_gauld_latest)
+keyboard.add(apod_random)
+keyboard.add(apod_latest)
+keyboard.add(smth_random)
 keyboard_small.add(again)
 keyboard_start.add(get_all_latest)
+keyboard_start.add(smth_random)
 keyboard_start.add(show_all)
 keyboard_init.add(start)
 
@@ -50,7 +58,9 @@ def return_comic(call, get_comic, link, latest=False):
         img, txt = get_comic(link)
     else:
         img, txt = get_comic(link, latest)
-    if not img:
+    if get_comic in (codo.get_apod, codo.get_apod_random):
+        bot.send_message(call.message.chat.id, txt)
+    elif not img:
         bot.send_message(call.message.chat.id, error_msg, reply_markup=keyboard_small)
     else:
         bot.send_photo(call.message.chat.id, img, txt)
@@ -94,6 +104,12 @@ def callback_worker(call):
     if call.data == "tom_gauld_latest":
         return_comic(call, codo.get_tom_gauld, links.tom_gauld_latest)
         _again()
+    if call.data == "apod_latest":
+        return_comic(call, codo.get_apod, links.apod_latest)
+        _again()
+    if call.data == "apod_random":
+        return_comic(call, codo.get_apod_random, links.apod_archive)
+        _again()
     if call.data in ("again", "show_all"):
         bot.send_message(call.message.chat.id, 'Choose wisely!', reply_markup=keyboard)
     if call.data == "get_all_latest":
@@ -103,6 +119,17 @@ def callback_worker(call):
         return_comic(call, codo.get_exo, links.exo_latest)
         return_comic(call, codo.get_tom_gauld, links.tom_gauld_latest)
         bot.send_message(call.message.chat.id, 'Here you go! Want more?', reply_markup=keyboard_small)
+    if call.data == "smth_random":
+        random_list = [(codo.get_xkcd, links.xkcd_random),
+                       (codo.get_goose, links.goose_random),
+                       (codo.get_poorlydrawnlines, links.poorlydrawnlines_random),
+                       (codo.get_smbc_from_archive, links.smbc_archive),
+                       (codo.get_exo_archive, links.exo_archive),
+                       (codo.get_tom_gauld, links.tom_gauld_random),
+                       (codo.get_apod_random, links.apod_archive)]
+        func, link = random.choice(random_list)
+        return_comic(call, func, link)
+        _again()
 
 
 @bot.message_handler(content_types=['text'])

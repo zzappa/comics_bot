@@ -26,6 +26,8 @@ exo_random = telebot.types.InlineKeyboardButton(text='random Extra Ordinary', ca
 exo_latest = telebot.types.InlineKeyboardButton(text='latest Extra Ordinary', callback_data='exo_latest')
 tom_gauld_random = telebot.types.InlineKeyboardButton(text='random Tom Gauld', callback_data='tom_gauld_random')
 tom_gauld_latest = telebot.types.InlineKeyboardButton(text='latest Tom Gauld', callback_data='tom_gauld_latest')
+dilbert_random = telebot.types.InlineKeyboardButton(text='random Dilbert', callback_data='dilbert_random')
+dilbert_latest = telebot.types.InlineKeyboardButton(text='latest Dilbert', callback_data='dilbert_latest')
 apod_random = telebot.types.InlineKeyboardButton(text='random APOD', callback_data='apod_random')
 apod_latest = telebot.types.InlineKeyboardButton(text='latest APOD', callback_data='apod_latest')
 again = telebot.types.InlineKeyboardButton(text='Yesss!', callback_data='again')
@@ -39,6 +41,7 @@ keyboard.row(poorlydrawnlines_random, poorlydrawnlines_latest)
 keyboard.row(smbc_random, smbc_latest)
 keyboard.row(exo_random, exo_latest)
 keyboard.row(tom_gauld_random, tom_gauld_latest)
+keyboard.row(dilbert_random, dilbert_latest)
 keyboard.row(apod_random, apod_latest)
 keyboard.add(smth_random)
 keyboard_small.add(again)
@@ -99,6 +102,12 @@ def callback_worker(call):
     if call.data == "tom_gauld_latest":
         return_comic(call, codo.get_tom_gauld, links.tom_gauld_latest)
         _again()
+    if call.data == "dilbert_latest":
+        return_comic(call, codo.get_dilbert, links.dilbert, latest=True)
+        _again()
+    if call.data == "dilbert_random":
+        return_comic(call, codo.get_dilbert, links.dilbert)
+        _again()
     if call.data == "apod_latest":
         return_comic(call, apod.get_apod, links.apod_latest)
         _again()
@@ -121,6 +130,7 @@ def callback_worker(call):
                        (codo.get_smbc_from_archive, links.smbc_archive),
                        (codo.get_exo_archive, links.exo_archive),
                        (codo.get_tom_gauld, links.tom_gauld_random),
+                       (codo.get_dilbert, links.dilbert),
                        (apod.get_apod_random, links.apod_archive)]
         func, link = random.choice(random_list)
         return_comic(call, func, link)

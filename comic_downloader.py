@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 import random
 import logging
 import datetime
-from urllib.parse import urlparse
 
 from links import smbc_latest
 
@@ -163,3 +162,36 @@ def get_tom_gauld(link):
     except Exception:
         txt = src
     return i, txt
+
+
+def get_dilbert(link, latest=False):
+    if latest:
+        date = str(datetime.date.today())
+    else:
+        date = _dilbert_random_date()
+    full_link = link + date
+    r = requests.get(full_link)
+    soup = BeautifulSoup(r.text, 'html5lib')
+    images = soup.findAll('img')
+    url = str(images[2]['src'])
+    try:
+        img = requests.get(url)
+        logging.warning(img.url)
+        i = Image.open(BytesIO(img.content))
+        txt = str(images[2]['alt']) + "\nSource: " + full_link
+    except Exception:
+        i = None
+        txt = None
+    return i, txt
+
+
+def _dilbert_random_date():
+    end_date = datetime.date.today()
+    start_date = datetime.date(1989, 4, 16)
+
+    time_between_dates = end_date - start_date
+    days_between_dates = time_between_dates.days
+    random_number_of_days = random.randrange(days_between_dates)
+    random_date = start_date + datetime.timedelta(days=random_number_of_days)
+
+    return str(random_date)

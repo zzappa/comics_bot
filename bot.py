@@ -3,6 +3,7 @@ import random
 
 import links
 import comic_downloader as codo
+import apod
 
 bot = telebot.TeleBot('insert-token-here')
 
@@ -52,7 +53,7 @@ def return_comic(call, get_comic, link, latest=False):
         img, txt = get_comic(link)
     else:
         img, txt = get_comic(link, latest)
-    if get_comic in (codo.get_apod, codo.get_apod_random):
+    if get_comic in (apod.get_apod, apod.get_apod_random):
         bot.send_message(call.message.chat.id, txt)
     elif not img:
         bot.send_message(call.message.chat.id, error_msg, reply_markup=keyboard_small)
@@ -99,10 +100,10 @@ def callback_worker(call):
         return_comic(call, codo.get_tom_gauld, links.tom_gauld_latest)
         _again()
     if call.data == "apod_latest":
-        return_comic(call, codo.get_apod, links.apod_latest)
+        return_comic(call, apod.get_apod, links.apod_latest)
         _again()
     if call.data == "apod_random":
-        return_comic(call, codo.get_apod_random, links.apod_archive)
+        return_comic(call, apod.get_apod_random, links.apod_archive)
         _again()
     if call.data in ("again", "show_all"):
         bot.send_message(call.message.chat.id, 'Choose wisely!', reply_markup=keyboard)
@@ -120,7 +121,7 @@ def callback_worker(call):
                        (codo.get_smbc_from_archive, links.smbc_archive),
                        (codo.get_exo_archive, links.exo_archive),
                        (codo.get_tom_gauld, links.tom_gauld_random),
-                       (codo.get_apod_random, links.apod_archive)]
+                       (apod.get_apod_random, links.apod_archive)]
         func, link = random.choice(random_list)
         return_comic(call, func, link)
         _again()

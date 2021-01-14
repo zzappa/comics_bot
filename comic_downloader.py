@@ -9,6 +9,7 @@ import logging
 import datetime
 
 from links import smbc_latest
+from utils import get_random_date
 
 
 def get_xkcd(link):
@@ -168,7 +169,7 @@ def get_dilbert(link, latest=False):
     if latest:
         date = str(datetime.date.today())
     else:
-        date = _dilbert_random_date()
+        date = get_random_date(1989, 4, 16)
     full_link = link + date
     r = requests.get(full_link)
     soup = BeautifulSoup(r.text, 'html5lib')
@@ -183,15 +184,3 @@ def get_dilbert(link, latest=False):
         i = None
         txt = None
     return i, txt
-
-
-def _dilbert_random_date():
-    end_date = datetime.date.today()
-    start_date = datetime.date(1989, 4, 16)
-
-    time_between_dates = end_date - start_date
-    days_between_dates = time_between_dates.days
-    random_number_of_days = random.randrange(days_between_dates)
-    random_date = start_date + datetime.timedelta(days=random_number_of_days)
-
-    return str(random_date)

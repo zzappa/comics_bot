@@ -5,6 +5,8 @@ import logging
 import datetime
 from urllib.parse import urlparse
 
+from utils import get_random_date
+
 
 def get_apod(link):
     response = requests.get(link)
@@ -32,7 +34,7 @@ def get_apod(link):
 
 
 def get_apod_random(link):
-    date = _apod_random_date()
+    date = get_random_date(1995, 6, 16, "%y%m%d")
     url = link + date + '.html'
     logging.warning(url)
     img, txt = get_apod(url)
@@ -85,16 +87,3 @@ def _apod_title(soup):
         text = soup.title.text.split(' - ')[-1]
         title = text.strip()
         return title
-
-
-def _apod_random_date():
-    end_date = datetime.date.today()
-    start_date = datetime.date(1995, 6, 16)
-
-    time_between_dates = end_date - start_date
-    days_between_dates = time_between_dates.days
-    random_number_of_days = random.randrange(days_between_dates)
-    random_date = start_date + datetime.timedelta(days=random_number_of_days)
-
-    rand_date = random_date.strftime("%y%m%d")
-    return rand_date

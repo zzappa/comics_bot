@@ -32,19 +32,13 @@ get_all_latest = telebot.types.InlineKeyboardButton(text='Get all latest comics!
 smth_random = telebot.types.InlineKeyboardButton(text='Surprise me!', callback_data='smth_random')
 show_all = telebot.types.InlineKeyboardButton(text='Nah, show me all options.', callback_data='show_all')
 start = telebot.types.InlineKeyboardButton(text='Start!', callback_data='start')
-keyboard.add(xkcd_random)
-keyboard.add(xkcd_latest)
+keyboard.row(xkcd_random, xkcd_latest)
 keyboard.add(goose_random)
-keyboard.add(poorlydrawnlines_random)
-keyboard.add(poorlydrawnlines_latest)
-keyboard.add(smbc_random)
-keyboard.add(smbc_latest)
-keyboard.add(exo_random)
-keyboard.add(exo_latest)
-keyboard.add(tom_gauld_random)
-keyboard.add(tom_gauld_latest)
-keyboard.add(apod_random)
-keyboard.add(apod_latest)
+keyboard.row(poorlydrawnlines_random, poorlydrawnlines_latest)
+keyboard.row(smbc_random, smbc_latest)
+keyboard.row(exo_random, exo_latest)
+keyboard.row(tom_gauld_random, tom_gauld_latest)
+keyboard.row(apod_random, apod_latest)
 keyboard.add(smth_random)
 keyboard_small.add(again)
 keyboard_start.add(get_all_latest)
@@ -135,7 +129,7 @@ def callback_worker(call):
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
     if len(message.text) >= 1 and message.text.lower() != 'start':
-        bot.send_message(message.from_user.id,
+        bot.send_message(message.chat.id,
                          "Hello there! I'm TheComicBot and I can show your some comics."
                          "\nChoose a comic you want.",
                          reply_markup=keyboard)

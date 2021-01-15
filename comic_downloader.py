@@ -9,7 +9,7 @@ import logging
 import datetime
 
 from links import smbc_latest
-from utils import get_random_date
+from utils import get_random_date, fetch_image
 
 
 def get_xkcd(link):
@@ -18,8 +18,8 @@ def get_xkcd(link):
     try:
         urls_png = re.findall('https?://imgs.xkcd.com/.*png', r.text)
         urls_jpg = re.findall('https?://imgs.xkcd.com/.*jpe?g', r.text)
-        img = requests.get(urls_png[0] if urls_png else urls_jpg[0])
-        i = Image.open(BytesIO(img.content))
+        url = urls_png[0] if urls_png else urls_jpg[0]
+        i = fetch_image(url)
     except Exception:
         i = None
     src = '\nSource: ' + r.url
@@ -40,8 +40,8 @@ def get_goose(link):
     try:
         urls_strips = re.findall('https?://abstrusegoose.com/strips/.*png', r.text)
         urls_images = re.findall('https?://abstrusegoose.com/images/.*png', r.text)
-        img = requests.get(urls_strips[0] if urls_strips else urls_images[0])
-        i = Image.open(BytesIO(img.content))
+        url = urls_strips[0] if urls_strips else urls_images[0]
+        i = fetch_image(url)
     except Exception:
         i = None
     src = '\nSource: ' + r.url
@@ -73,13 +73,8 @@ def get_poorlydrawnlines(link, latest=False):
         except Exception:
             i = None
             txt = ''
-    try:
-        img = requests.get(img_url)
-        i = Image.open(BytesIO(img.content))
-        txt = '\nSource: ' + r.url
-    except Exception:
-        i = None
-        txt = ''
+    i = fetch_image(img_url)
+    txt = '\nSource: ' + r.url
     return i, txt
 
 
@@ -97,12 +92,7 @@ def get_smbc(link):
     if not urls:
         logging.warning(link)
         return None, None
-    try:
-        img = requests.get(urls[0])
-        i = Image.open(BytesIO(img.content))
-    except Exception:
-        i = None
-
+    i = fetch_image(urls[0])
     return i, txt
 
 
@@ -124,13 +114,8 @@ def get_exo(link):
     r = requests.get(link)
     logging.warning(r.url)
     urls = re.findall('https?://www.exocomics.com/wp-content/uploads/.*jpg', r.text)
-    try:
-        img = requests.get(urls[0])
-        i = Image.open(BytesIO(img.content))
-        txt = '\nSource: ' + r.url
-    except Exception:
-        i = None
-        txt = ''
+    i = fetch_image(urls[0])
+    txt = '\nSource: ' + r.url
     return i, txt
 
 
@@ -151,13 +136,9 @@ def get_tom_gauld(link):
     logging.warning(r.url)
     soup = BeautifulSoup(r.text, 'html.parser')
     images = soup.findAll('img')
-    url = re.findall('https?://64.media.tumblr.com/.*jpg', str(images[0]))
+    urls = re.findall('https?://64.media.tumblr.com/.*jpg', str(images[0]))
     src = '\nSource: ' + r.url
-    try:
-        img = requests.get(url[0])
-        i = Image.open(BytesIO(img.content))
-    except Exception:
-        i = None
+    i = fetch_image(urls[0])
     try:
         txt = str(images[0]).split("src")[0].lstrip('<img alt=') + src
     except Exception:
@@ -175,13 +156,10 @@ def get_dilbert(link, latest=False):
     soup = BeautifulSoup(r.text, 'html5lib')
     images = soup.findAll('img')
     url = str(images[2]['src'])
+    i = fetch_image(url)
     try:
-        img = requests.get(url)
-        logging.warning(img.url)
-        i = Image.open(BytesIO(img.content))
         txt = str(images[2]['alt']) + "\nSource: " + full_link
     except Exception:
-        i = None
         txt = None
     return i, txt
 
@@ -191,12 +169,9 @@ def get_phd(link):
     soup = BeautifulSoup(r.text, 'html5lib')
     images = soup.findAll('img', {"id": "comic", "name": "comic"})
     url = images[0]["src"]
+    i = fetch_image(url)
     try:
-        img = requests.get(url)
-        logging.warning(img.url)
-        i = Image.open(BytesIO(img.content))
         txt = "\nSource: " + r.url
     except Exception:
-        i = None
         txt = None
     return i, txt

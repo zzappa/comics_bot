@@ -1,4 +1,8 @@
+import requests
+from PIL import Image
+from io import BytesIO
 import random
+import logging
 import datetime
 
 
@@ -20,3 +24,13 @@ def get_random_date(start_year: int, start_month: int, start_day: int, format: s
     else:
         formatted_date = str(random_date)
     return formatted_date
+
+
+def fetch_image(link):
+    try:
+        img = requests.get(link)
+        logging.warning(img.url)
+        i = Image.open(BytesIO(img.content))
+    except Exception:
+        i = None
+    return i

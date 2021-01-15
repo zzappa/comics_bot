@@ -170,8 +170,5 @@ def get_phd(link):
     images = soup.findAll('img', {"id": "comic", "name": "comic"})
     url = images[0]["src"]
     i = fetch_image(url)
-    try:
-        txt = "\nSource: " + r.url
-    except Exception:
-        txt = None
+    txt = "\nSource: " + r.url
     return i, txt

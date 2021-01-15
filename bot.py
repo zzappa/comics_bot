@@ -127,7 +127,7 @@ def callback_worker(call):
         bot.send_message(call.message.chat.id, 'Choose wisely!', reply_markup=keyboard)
     if call.data == "get_all_latest":
         return_comic(call, codo.get_xkcd, links.xkcd_latest)
-        return_comic(call, codo.get_poorlydrawnlines, links.poorlydrawnlines_latest, latest=True)
+        return_comic(call, codo.get_poorlydrawnlines, links.poorlydrawnlines_latest)
         return_comic(call, codo.get_smbc, links.smbc_latest)
         return_comic(call, codo.get_exo, links.exo_latest)
         return_comic(call, codo.get_tom_gauld, links.tom_gauld_latest)
@@ -135,7 +135,7 @@ def callback_worker(call):
     if call.data == "smth_random":
         random_list = [(codo.get_xkcd, links.xkcd_random),
                        (codo.get_goose, links.goose_random),
-                       (codo.get_poorlydrawnlines, links.poorlydrawnlines_random),
+                       (codo.get_poorlydrawnlines_archive, links.poorlydrawnlines_random),
                        (codo.get_smbc_from_archive, links.smbc_archive),
                        (codo.get_exo_archive, links.exo_archive),
                        (codo.get_tom_gauld, links.tom_gauld_random),

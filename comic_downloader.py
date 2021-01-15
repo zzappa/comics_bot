@@ -56,7 +56,7 @@ def get_goose(link):
 
 def get_poorlydrawnlines(link, latest=False):
     r = requests.get(link)
-    soup = BeautifulSoup(r.text, 'html.parser')
+    soup = BeautifulSoup(r.text, 'html5lib')
     list_of_comics = []
     for link in soup.find_all('a'):
         list_of_comics.append(link.get('href'))
@@ -171,4 +171,16 @@ def get_phd(link):
     url = images[0]["src"]
     i = fetch_image(url)
     txt = "\nSource: " + r.url
+    return i, txt
+
+
+def get_phd_random(link):
+    r = requests.get(link)
+    soup = BeautifulSoup(r.text, 'html5lib')
+    list_of_comics = []
+    for link in soup.find_all('a'):
+        if 'http://www.phdcomics.com/comics/archive.php?comicid=' in str(link.get('href')):
+            list_of_comics.append(link.get('href'))
+    rand = random.choice(list_of_comics)
+    i, txt = get_phd(rand)
     return i, txt

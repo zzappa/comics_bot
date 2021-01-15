@@ -28,6 +28,7 @@ tom_gauld_random = telebot.types.InlineKeyboardButton(text='random Tom Gauld', c
 tom_gauld_latest = telebot.types.InlineKeyboardButton(text='latest Tom Gauld', callback_data='tom_gauld_latest')
 dilbert_random = telebot.types.InlineKeyboardButton(text='random Dilbert', callback_data='dilbert_random')
 dilbert_latest = telebot.types.InlineKeyboardButton(text='latest Dilbert', callback_data='dilbert_latest')
+phd_random = telebot.types.InlineKeyboardButton(text='random PhD comics', callback_data='phd_random')
 phd_latest = telebot.types.InlineKeyboardButton(text='latest PhD comics', callback_data='phd_latest')
 apod_random = telebot.types.InlineKeyboardButton(text='random APOD', callback_data='apod_random')
 apod_latest = telebot.types.InlineKeyboardButton(text='latest APOD', callback_data='apod_latest')
@@ -43,7 +44,7 @@ keyboard.row(smbc_random, smbc_latest)
 keyboard.row(exo_random, exo_latest)
 keyboard.row(tom_gauld_random, tom_gauld_latest)
 keyboard.row(dilbert_random, dilbert_latest)
-keyboard.add(phd_latest)
+keyboard.row(phd_random, phd_latest)
 keyboard.row(apod_random, apod_latest)
 keyboard.add(smth_random)
 keyboard_small.add(again)
@@ -110,6 +111,9 @@ def callback_worker(call):
     if call.data == "dilbert_random":
         return_comic(call, codo.get_dilbert, links.dilbert)
         _again()
+    if call.data == "phd_random":
+        return_comic(call, codo.get_phd_random, links.phd_archive)
+        _again()
     if call.data == "phd_latest":
         return_comic(call, codo.get_phd, links.phd_latest)
         _again()
@@ -136,6 +140,7 @@ def callback_worker(call):
                        (codo.get_exo_archive, links.exo_archive),
                        (codo.get_tom_gauld, links.tom_gauld_random),
                        (codo.get_dilbert, links.dilbert),
+                       (codo.get_phd_random, links.phd_archive),
                        (apod.get_apod_random, links.apod_archive)]
         func, link = random.choice(random_list)
         return_comic(call, func, link)

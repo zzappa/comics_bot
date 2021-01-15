@@ -184,3 +184,19 @@ def get_dilbert(link, latest=False):
         i = None
         txt = None
     return i, txt
+
+
+def get_phd(link):
+    r = requests.get(link)
+    soup = BeautifulSoup(r.text, 'html5lib')
+    images = soup.findAll('img', {"id": "comic", "name": "comic"})
+    url = images[0]["src"]
+    try:
+        img = requests.get(url)
+        logging.warning(img.url)
+        i = Image.open(BytesIO(img.content))
+        txt = "\nSource: " + r.url
+    except Exception:
+        i = None
+        txt = None
+    return i, txt

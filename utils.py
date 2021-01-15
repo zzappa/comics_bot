@@ -2,11 +2,11 @@ import random
 import datetime
 
 
-def get_random_date(start_year, start_month, start_day, format=''):
+def get_random_date(start_year: int, start_month: int, start_day: int, format: str = '') -> str:
     """
     Get random date from start_date and today.
     :param format: if date need to be in specific str format, ie .strftime("%y%m%d")
-    :return:
+    :return: formatted_date: str representation of random_date
     """
     end_date = datetime.date.today()
     start_date = datetime.date(start_year, start_month, start_day)

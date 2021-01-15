@@ -1,8 +1,6 @@
 import requests
 import re
 import html
-from PIL import Image
-from io import BytesIO
 from bs4 import BeautifulSoup
 import random
 import logging
@@ -54,27 +52,36 @@ def get_goose(link):
     return i, txt
 
 
-def get_poorlydrawnlines(link, latest=False):
+def get_poorlydrawnlines(link):
+    r = requests.get(link)
+    logging.warning(r.url)
+    try:
+        if r.url.endswith('comic/'):
+            soup = BeautifulSoup(r.text, 'html5lib')
+            list_of_comics = []
+            for link in soup.find_all('a'):
+                if ('png' or 'jpg') in str(link.get('href')):
+                    list_of_comics.append(link.get('href'))
+            url = list_of_comics[0]
+        else:
+            urls = re.findall('https?://www.poorlydrawnlines.com/wp-content/uploads/.*j?p?n?g', r.text)
+            url = urls[0].split()[0]
+    except Exception:
+        return None, None
+    i = fetch_image(url)
+    txt = '\nSource: ' + r.url
+    return i, txt
+
+
+def get_poorlydrawnlines_archive(link):
     r = requests.get(link)
     soup = BeautifulSoup(r.text, 'html5lib')
     list_of_comics = []
     for link in soup.find_all('a'):
         list_of_comics.append(link.get('href'))
-    if latest:
-        img_url = [i for i in list_of_comics if ('png' or 'jpg') in i][0]
-    else:
-        del list_of_comics[:15]
-        url = random.choice(list_of_comics)
-        r = requests.get(url)
-        logging.warning(r.url)
-        urls = re.findall('https?://www.poorlydrawnlines.com/wp-content/uploads/.*png', r.text)
-        try:
-            img_url = urls[0].split()[0]
-        except Exception:
-            i = None
-            txt = ''
-    i = fetch_image(img_url)
-    txt = '\nSource: ' + r.url
+    del list_of_comics[:15]
+    url = random.choice(list_of_comics)
+    i, txt = get_poorlydrawnlines(url)
     return i, txt
 
 
@@ -97,8 +104,8 @@ def get_smbc(link):
 
 
 def get_smbc_from_archive(link):
-    all = requests.get(link)
-    soup = BeautifulSoup(all.text, 'html5lib')
+    r = requests.get(link)
+    soup = BeautifulSoup(r.text, 'html5lib')
     list_of_comics = []
     for link in soup.find_all('option'):
         list_of_comics.append(link)

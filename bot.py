@@ -82,10 +82,10 @@ def callback_worker(call):
         return_comic(call, codo.get_goose, links.goose_random)
         _again()
     if call.data == "poorlydrawnlines_random":
-        return_comic(call, codo.get_poorlydrawnlines, links.poorlydrawnlines_random)
+        return_comic(call, codo.get_poorlydrawnlines_archive, links.poorlydrawnlines_random)
         _again()
     if call.data == "poorlydrawnlines_latest":
-        return_comic(call, codo.get_poorlydrawnlines, links.poorlydrawnlines_latest, latest=True)
+        return_comic(call, codo.get_poorlydrawnlines, links.poorlydrawnlines_latest)
         _again()
     if call.data == "smbc_random":
         return_comic(call, codo.get_smbc_from_archive, links.smbc_archive)

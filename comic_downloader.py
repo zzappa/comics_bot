@@ -66,6 +66,8 @@ def get_poorlydrawnlines(link):
         else:
             urls = re.findall('https?://www.poorlydrawnlines.com/wp-content/uploads/.*j?p?n?g', r.text)
             url = urls[0].split()[0]
+            if url.endswith('><img'):
+                url = url.rstrip('><img')
     except Exception:
         return None, None
     i = fetch_image(url)

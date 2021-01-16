@@ -1,57 +1,22 @@
-import telebot
 import random
+from datetime import datetime
+from dateutil import parser
+import feedparser
+import logging
+import schedule
+import time
+from threading import Thread
+import pytz
 
 import links
 import comic_downloader as codo
 import apod
+from bot_init import bot, keyboard, keyboard_start, keyboard_small, keyboard_sub
 
-bot = telebot.TeleBot('insert-token-here')
-
+DEBUG = False
+chat_id = ''
+subscribe = False
 error_msg = "Smth went wrong, ahaha. You can try again!"
-
-keyboard = telebot.types.InlineKeyboardMarkup()
-keyboard_small = telebot.types.InlineKeyboardMarkup()
-keyboard_start = telebot.types.InlineKeyboardMarkup()
-keyboard_init = telebot.types.InlineKeyboardMarkup()
-xkcd_random = telebot.types.InlineKeyboardButton(text='random xkcd', callback_data='xkcd_random')
-xkcd_latest = telebot.types.InlineKeyboardButton(text='latest xkcd', callback_data='xkcd_latest')
-goose_random = telebot.types.InlineKeyboardButton(text='random Abstruse Goose', callback_data='goose_random')
-poorlydrawnlines_random = telebot.types.InlineKeyboardButton(text='random Poorly Drawn Lines',
-                                                             callback_data='poorlydrawnlines_random')
-poorlydrawnlines_latest = telebot.types.InlineKeyboardButton(text='latest Poorly Drawn Lines',
-                                                             callback_data='poorlydrawnlines_latest')
-smbc_random = telebot.types.InlineKeyboardButton(text='random SMBC', callback_data='smbc_random')
-smbc_latest = telebot.types.InlineKeyboardButton(text='latest SMBC', callback_data='smbc_latest')
-exo_random = telebot.types.InlineKeyboardButton(text='random Extra Ordinary', callback_data='exo_random')
-exo_latest = telebot.types.InlineKeyboardButton(text='latest Extra Ordinary', callback_data='exo_latest')
-tom_gauld_random = telebot.types.InlineKeyboardButton(text='random Tom Gauld', callback_data='tom_gauld_random')
-tom_gauld_latest = telebot.types.InlineKeyboardButton(text='latest Tom Gauld', callback_data='tom_gauld_latest')
-dilbert_random = telebot.types.InlineKeyboardButton(text='random Dilbert', callback_data='dilbert_random')
-dilbert_latest = telebot.types.InlineKeyboardButton(text='latest Dilbert', callback_data='dilbert_latest')
-phd_random = telebot.types.InlineKeyboardButton(text='random PhD comics', callback_data='phd_random')
-phd_latest = telebot.types.InlineKeyboardButton(text='latest PhD comics', callback_data='phd_latest')
-apod_random = telebot.types.InlineKeyboardButton(text='random APOD', callback_data='apod_random')
-apod_latest = telebot.types.InlineKeyboardButton(text='latest APOD', callback_data='apod_latest')
-again = telebot.types.InlineKeyboardButton(text='Yesss!', callback_data='again')
-get_all_latest = telebot.types.InlineKeyboardButton(text='Get all latest comics!', callback_data='get_all_latest')
-smth_random = telebot.types.InlineKeyboardButton(text='Surprise me!', callback_data='smth_random')
-show_all = telebot.types.InlineKeyboardButton(text='Nah, show me all options.', callback_data='show_all')
-start = telebot.types.InlineKeyboardButton(text='Start!', callback_data='start')
-keyboard.row(xkcd_random, xkcd_latest)
-keyboard.add(goose_random)
-keyboard.row(poorlydrawnlines_random, poorlydrawnlines_latest)
-keyboard.row(smbc_random, smbc_latest)
-keyboard.row(exo_random, exo_latest)
-keyboard.row(tom_gauld_random, tom_gauld_latest)
-keyboard.row(dilbert_random, dilbert_latest)
-keyboard.row(phd_random, phd_latest)
-keyboard.row(apod_random, apod_latest)
-keyboard.add(smth_random)
-keyboard_small.add(again)
-keyboard_start.add(get_all_latest)
-keyboard_start.add(smth_random)
-keyboard_start.add(show_all)
-keyboard_init.add(start)
 
 
 def return_comic(call, get_comic, link, latest=False):
@@ -59,7 +24,7 @@ def return_comic(call, get_comic, link, latest=False):
         img, txt = get_comic(link)
     else:
         img, txt = get_comic(link, latest)
-    if get_comic in (apod.get_apod, apod.get_apod_random):
+    if 'apod' in link:
         bot.send_message(call.message.chat.id, txt)
     elif not img:
         bot.send_message(call.message.chat.id, error_msg, reply_markup=keyboard_small)
@@ -71,7 +36,8 @@ def return_comic(call, get_comic, link, latest=False):
 def callback_worker(call):
     def _again():
         bot.send_message(call.message.chat.id, "Again?", reply_markup=keyboard_small)
-
+    global chat_id, subscribe
+    chat_id = call.message.chat.id
     if call.data == "xkcd_random":
         return_comic(call, codo.get_xkcd, links.xkcd_random)
         _again()
@@ -131,6 +97,9 @@ def callback_worker(call):
         return_comic(call, codo.get_smbc, links.smbc_latest)
         return_comic(call, codo.get_exo, links.exo_latest)
         return_comic(call, codo.get_tom_gauld, links.tom_gauld_latest)
+        return_comic(call, codo.get_dilbert, links.dilbert)
+        return_comic(call, codo.get_phd, links.phd_latest)
+        return_comic(call, apod.get_apod, links.apod_latest)
         bot.send_message(call.message.chat.id, 'Here you go! Want more?', reply_markup=keyboard_small)
     if call.data == "smth_random":
         random_list = [(codo.get_xkcd, links.xkcd_random),
@@ -145,21 +114,94 @@ def callback_worker(call):
         func, link = random.choice(random_list)
         return_comic(call, func, link)
         _again()
+    if call.data == "subscribe":
+        logging.warning("chat id " + str(chat_id))
+        chat_id = call.message.chat.id
+        subscribe = True
+        logging.warning("You've got subscribed")
+        bot.send_message(call.message.chat.id, "You've got subscribed :)")
+    if call.data == "unsubscribe":
+        subscribe = False
+        logging.warning("You've got unsubscribed")
+        bot.send_message(call.message.chat.id, "You've got unsubscribed :(")
 
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    if len(message.text) >= 1 and message.text.lower() != 'start':
+    if len(message.text) >= 1 and message.text.lower() not in ('start', 'subscribe', 'unsubscribe'):
         bot.send_message(message.chat.id,
                          "Hello there! I'm TheComicBot and I can show your some comics."
                          "\nChoose a comic you want.",
                          reply_markup=keyboard)
-    elif message.text.lower() == 'start':
+    elif message.text.lower() in ('start'):
         bot.send_message(message.chat.id,
                          "Hello there! I'm TheComicBot! What do you want?",
                          reply_markup=keyboard_start)
+    elif message.text.lower() in ('subscribe', 'unsubscribe'):
+        bot.send_message(message.chat.id, 'Do you want to change subscription?',
+                         reply_markup=keyboard_sub)
     else:
         bot.send_message(message.from_user.id, "Please try again.")
 
 
-bot.polling(none_stop=True, interval=0)
+def rss_monitor():
+    """Checks rss, returns new images if their date is today."""
+    utc = pytz.UTC
+    rss_list = (
+                (codo.get_xkcd, links.xkcd_rss),
+                (codo.get_smbc, links.smbc_rss),
+                (codo.get_poorlydrawnlines, links.poorlydrawnlines_rss),
+                (codo.get_exo, links.exo_rss),
+                (codo.get_tom_gauld, links.tom_gauld_rss),
+                (codo.get_dilbert, links.dilbert),
+                (codo.get_phd, links.phd_rss),
+                (apod.get_apod, links.apod_latest),
+                )
+    def _check(func, rss):
+        logging.warning(str(subscribe))
+        if subscribe:
+            try:
+                rss_feed = feedparser.parse(rss)
+                logging.warning('checking rss')
+                parsed_date = parser.parse(rss_feed.entries[0].published)
+                today = utc.localize(datetime.today()).day, utc.localize(datetime.today()).month
+                yesterday = utc.localize(datetime.today()).day - 1, utc.localize(datetime.today()).month
+                if (parsed_date.day, parsed_date.month) in (today, yesterday):
+                    url = rss_feed.entries[0].link
+                else:
+                    url = None
+            except Exception:
+                url = rss
+            if url:
+                if 'dilbert' in rss:
+                    i, txt = func(rss, latest=True)
+                else:
+                    i, txt = func(url)
+                if 'apod' in rss:
+                    bot.send_message(chat_id, txt)
+                else:
+                    bot.send_photo(chat_id, i, txt)
+
+    for func, rss in rss_list:
+        _check(func, rss)
+
+
+def do_schedule():
+    if DEBUG:
+        schedule.every(5).seconds.do(rss_monitor)
+    else:
+        schedule.every().day.at("13:37").do(rss_monitor)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+def main_loop():
+    thread = Thread(target=do_schedule)
+    thread.start()
+
+    bot.polling(True)
+
+
+if __name__ == '__main__':
+    main_loop()

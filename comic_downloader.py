@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 import random
 import logging
 import datetime
+import feedparser
+from urllib.request import urlopen
 
 from links import smbc_latest
 from utils import get_random_date, fetch_image
@@ -193,3 +195,34 @@ def get_phd_random(link):
     rand = random.choice(list_of_comics)
     i, txt = get_phd(rand)
     return i, txt
+
+
+def get_new_yorker_cartoon(link):
+    r = urlopen(link)
+    page = BeautifulSoup(r, "html5lib")
+    logging.warning(r.url)
+    links = []
+    for link in page.findAll("picture", {"class": "responsive-cartoon__image responsive-image"}):
+        links.append(link)
+    res = []
+    for item in links:
+        caption = re.findall('<img alt=.*" class="responsive-image__image', str(item))[0].lstrip('<img alt="').rstrip(
+            ' class="responsive-image__image')
+        url = re.findall('class="responsive-image__image" sizes="100vw".* srcset=', str(item))[0].lstrip(
+            'class="responsive-image__image" sizes="100vw" src="').rstrip('" srcset=')
+        logging.warning(url)
+        i = fetch_image(url)
+        txt = html.unescape(caption)
+        res.append((i, txt))
+    return res
+
+
+def get_new_yorker_rss(link):
+    rss_feed = feedparser.parse(link)
+    logging.warning('checking rss')
+    res = []
+    for item in rss_feed.entries[:2]:
+        url = item.link
+        temp = get_new_yorker_cartoon(url)
+        res.append(temp)
+    return res

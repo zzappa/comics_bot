@@ -20,3 +20,4 @@ dilbert = 'https://dilbert.com/strip/' # it's daily, so there's no need for rss
 phd_latest = 'http://phdcomics.com/'
 phd_archive = 'http://phdcomics.com/comics/archive_list.php'
 phd_rss = 'http://phdcomics.com/gradfeed.php'
+new_yorker_daily_rss = 'https://www.newyorker.com/feed/cartoons/issue-cartoons'

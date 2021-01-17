@@ -13,7 +13,7 @@ import comic_downloader as codo
 import apod
 from bot_init import bot, keyboard, keyboard_start, keyboard_small, keyboard_sub
 
-DEBUG = False
+DEBUG = True
 chat_id = ''
 subscribe = False
 error_msg = "Smth went wrong, ahaha. You can try again!"
@@ -88,6 +88,15 @@ def callback_worker(call):
         _again()
     if call.data == "apod_random":
         return_comic(call, apod.get_apod_random, links.apod_archive)
+        _again()
+    if call.data == "new_yorker":
+        res = codo.get_new_yorker_rss(links.new_yorker_daily_rss)
+        for item in res:
+            for i, txt in item:
+                if not i:
+                    bot.send_message(call.message.chat.id, error_msg, reply_markup=keyboard_small)
+                else:
+                    bot.send_photo(call.message.chat.id, i, txt)
         _again()
     if call.data in ("again", "show_all"):
         bot.send_message(call.message.chat.id, 'Choose wisely!', reply_markup=keyboard)
@@ -166,7 +175,7 @@ def rss_monitor():
                 parsed_date = parser.parse(rss_feed.entries[0].published)
                 today = utc.localize(datetime.today()).day, utc.localize(datetime.today()).month
                 yesterday = utc.localize(datetime.today()).day - 1, utc.localize(datetime.today()).month
-                if (parsed_date.day, parsed_date.month) in (today, yesterday):
+                if (parsed_date.day, parsed_date.month) in (today, yesterday) or parsed_date.day > today[0]:
                     url = rss_feed.entries[0].link
                 else:
                     url = None

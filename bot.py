@@ -25,17 +25,18 @@ def return_comic(call, get_comic, link, latest=False):
     else:
         img, txt = get_comic(link, latest)
     if 'apod' in link:
-        bot.send_message(call.message.chat.id, txt)
+        bot.send_message(call.message.chat.id, txt, parse_mode='Markdown')
     elif not img:
         bot.send_message(call.message.chat.id, error_msg, reply_markup=keyboard_small)
     else:
-        bot.send_photo(call.message.chat.id, img, txt)
+        bot.send_photo(call.message.chat.id, img, txt, parse_mode='Markdown')
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
     def _again():
         bot.send_message(call.message.chat.id, "Again?", reply_markup=keyboard_small)
+
     global chat_id, subscribe
     chat_id = call.message.chat.id
     if call.data == "xkcd_random":
@@ -94,7 +95,8 @@ def callback_worker(call):
         for item in res:
             for i, txt in item:
                 if not i:
-                    bot.send_message(call.message.chat.id, error_msg, reply_markup=keyboard_small)
+                    bot.send_message(call.message.chat.id, error_msg, reply_markup=keyboard_small,
+                                     parse_mode='Markdown')
                 else:
                     bot.send_photo(call.message.chat.id, i, txt)
         _again()
@@ -157,15 +159,16 @@ def rss_monitor():
     """Checks rss, returns new images if their date is today."""
     utc = pytz.UTC
     rss_list = (
-                (codo.get_xkcd, links.xkcd_rss),
-                (codo.get_smbc, links.smbc_rss),
-                (codo.get_poorlydrawnlines, links.poorlydrawnlines_rss),
-                (codo.get_exo, links.exo_rss),
-                (codo.get_tom_gauld, links.tom_gauld_rss),
-                (codo.get_dilbert, links.dilbert),
-                (codo.get_phd, links.phd_rss),
-                (apod.get_apod, links.apod_latest),
-                )
+        (codo.get_xkcd, links.xkcd_rss),
+        (codo.get_smbc, links.smbc_rss),
+        (codo.get_poorlydrawnlines, links.poorlydrawnlines_rss),
+        (codo.get_exo, links.exo_rss),
+        (codo.get_tom_gauld, links.tom_gauld_rss),
+        (codo.get_dilbert, links.dilbert),
+        (codo.get_phd, links.phd_rss),
+        (apod.get_apod, links.apod_latest),
+    )
+
     def _check(func, rss):
         logging.warning(str(subscribe))
         if subscribe:
@@ -187,9 +190,9 @@ def rss_monitor():
                 else:
                     i, txt = func(url)
                 if 'apod' in rss:
-                    bot.send_message(chat_id, txt)
+                    bot.send_message(chat_id, txt, parse_mode='Markdown')
                 else:
-                    bot.send_photo(chat_id, i, txt)
+                    bot.send_photo(chat_id, i, txt, parse_mode='Markdown')
 
     for func, rss in rss_list:
         _check(func, rss)

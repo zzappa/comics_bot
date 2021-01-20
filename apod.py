@@ -29,7 +29,9 @@ def get_apod(link):
     except Exception:
         res = vids[0]
     logging.warning(res)
-    txt = _apod_title(soup) + "\n" + _apod_explanation(soup) + '\nSource: ' + res + " \n" + link
+    img_src = f' [Image]({res}).'
+    src = f' [Source]({link}).'
+    txt = _apod_title(soup) + "\n" + _apod_explanation(soup) + img_src + src
     return None, txt
 
 

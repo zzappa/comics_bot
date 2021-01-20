@@ -22,7 +22,7 @@ def get_xkcd(link):
         i = fetch_image(url)
     except Exception:
         i = None
-    src = '\nSource: ' + r.url
+    src = f' [Source]({r.url}).'
     try:
         txt = re.findall('{{Title.*}}', r.text)
         txt = html.unescape(txt[0].lstrip('{{Title text:').rstrip('}}').lstrip('{{Title text: ').rstrip('}}')) + src
@@ -44,7 +44,7 @@ def get_goose(link):
         i = fetch_image(url)
     except Exception:
         i = None
-    src = '\nSource: ' + r.url
+    src = f' [Source]({r.url}).'
     try:
         soup = BeautifulSoup(r.text, 'html5lib')
         txt = soup.find("div", {"id": "blog_text"})
@@ -73,7 +73,7 @@ def get_poorlydrawnlines(link):
     except Exception:
         return None, None
     i = fetch_image(url)
-    txt = '\nSource: ' + r.url
+    txt = f' [Source]({r.url}).'
     return i, txt
 
 
@@ -93,7 +93,7 @@ def get_smbc(link):
     r = requests.get(link)
     urls = re.findall('https?://www.smbc-comics.com/comics/.*p?n?gi?f?', r.text)
     logging.warning(r.url)
-    src = '\nSource: ' + r.url
+    src = f' [Source]({r.url}).'
     try:
         txt = re.findall('img\stitle=.*id="cc-comic"', r.text)
         txt = txt[0].lstrip('img title="').split('"')[0]
@@ -126,7 +126,7 @@ def get_exo(link):
     logging.warning(r.url)
     urls = re.findall('https?://www.exocomics.com/wp-content/uploads/.*jpg', r.text)
     i = fetch_image(urls[0])
-    txt = '\nSource: ' + r.url
+    txt = f' [Source]({r.url}).'
     return i, txt
 
 
@@ -148,7 +148,7 @@ def get_tom_gauld(link):
     soup = BeautifulSoup(r.text, 'html.parser')
     images = soup.findAll('img')
     urls = re.findall('https?://64.media.tumblr.com/.*jpg', str(images[0]))
-    src = '\nSource: ' + r.url
+    src = f' [Source]({r.url}).'
     i = fetch_image(urls[0])
     try:
         txt = str(images[0]).split("src")[0].lstrip('<img alt=') + src
@@ -168,8 +168,9 @@ def get_dilbert(link, latest=False):
     images = soup.findAll('img')
     url = str(images[2]['src'])
     i = fetch_image(url)
+    src = f' [Source]({full_link}).'
     try:
-        txt = str(images[2]['alt']) + "\nSource: " + full_link
+        txt = str(images[2]['alt']) + src
     except Exception:
         txt = None
     return i, txt
@@ -181,7 +182,7 @@ def get_phd(link):
     images = soup.findAll('img', {"id": "comic", "name": "comic"})
     url = images[0]["src"]
     i = fetch_image(url)
-    txt = "\nSource: " + r.url
+    txt = f' [Source]({r.url}).'
     return i, txt
 
 

@@ -26,6 +26,8 @@ def return_comic(call, get_comic, link, latest=False):
         img, txt = get_comic(link, latest)
     if 'apod' in link:
         bot.send_message(call.message.chat.id, txt, parse_mode='Markdown')
+    elif 'pbf' in link:
+        bot.send_message(call.message.chat.id, txt)
     elif not img:
         bot.send_message(call.message.chat.id, error_msg, reply_markup=keyboard_small)
     else:
@@ -90,6 +92,12 @@ def callback_worker(call):
     if call.data == "apod_random":
         return_comic(call, apod.get_apod_random, links.apod_archive)
         _again()
+    if call.data == "pbf_random":
+        return_comic(call, codo.get_pbf, links.pbf_random)
+        _again()
+    if call.data == "pbf_latest":
+        return_comic(call, codo.get_pbf, links.pbf_latest, latest=True)
+        _again()
     if call.data == "new_yorker":
         res = codo.get_new_yorker_rss(links.new_yorker_daily_rss)
         for item in res:
@@ -99,6 +107,9 @@ def callback_worker(call):
                                      parse_mode='Markdown')
                 else:
                     bot.send_photo(call.message.chat.id, i, txt)
+        _again()
+    if call.data == "calvinandhobbes":
+        return_comic(call, codo.get_calvin_and_hobbes, links.calvinandhobbes_random)
         _again()
     if call.data in ("again", "show_all"):
         bot.send_message(call.message.chat.id, 'Choose wisely!', reply_markup=keyboard)

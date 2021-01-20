@@ -1,6 +1,7 @@
 # ComicsBot
 
-ComicsBot can currently entertain you with 8 different web-comics (xkcd, SMBC, Abstruse Goose, Extra Ordinary, Poorly Drawn Lines, Dilbert, PhD comics, Tom Gauld's, and The New Yorker Daily Cartoon) and with NASA's Astronomy Picture of the Day (because these pics are cool!).
+ComicsBot can currently entertain you with 10 different web-comics 
+(xkcd, SMBC, Abstruse Goose, Extra Ordinary, Poorly Drawn Lines, Dilbert, PhD comics, Tom Gauld's, Perry Bible Fellowship, Calvin and Hobbes, and The New Yorker Daily Cartoon) and with NASA's Astronomy Picture of the Day (because these pics are cool!).
 It can show you the latest comic or a random one.
 Type "start" to see the options.
 

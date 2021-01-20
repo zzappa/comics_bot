@@ -115,7 +115,7 @@ def get_smbc_from_archive(link):
         list_of_comics.append(link)
     del list_of_comics[0]
     rand = random.choice(list_of_comics)
-    rand_clean = re.findall('comic\/.*"', str(rand))[0].rstrip('"')
+    rand_clean = re.findall('comic.*"', str(rand))[0].rstrip('"')
     new_link = smbc_latest + rand_clean
     img, txt = get_smbc(new_link)
     return img, txt
@@ -227,3 +227,43 @@ def get_new_yorker_rss(link):
         temp = get_new_yorker_cartoon(url)
         res.append(temp)
     return res
+
+
+def get_pbf(link, latest=False):
+    r = requests.get(link)
+    src = f'\nSource: {r.url}.'
+    page = BeautifulSoup(r.text, "html5lib")
+
+    links = []
+    for img in page.findAll("img", {"class": "lazyload"}):
+        if 'https://pbfcomics.com/wp-content/uploads/' in str(img):
+            links.append(img)
+    try:
+        if latest:
+            title = links[4]['title']
+            url = links[4]['data-src']
+        else:
+            title = links[3]['title']
+            url = links[3]['data-src']
+        logging.warning(url)
+        img_url = f'Image: {url}'
+        txt = title + '\n' + img_url + src
+    except Exception:
+        txt = None
+    return None, txt
+
+
+def get_calvin_and_hobbes(link):
+    r = requests.get(link)
+    logging.warning(r.url)
+    page = BeautifulSoup(r.text, "html5lib")
+
+    links = []
+    for img in page.findAll("div", {'class': "comic__image js-comic-swipe-target"}):
+        links.append(img)
+    urls = re.findall('src="https:\/\/assets\.amuniversal\.com.*srcset', str(links[0]))
+    url = urls[0].lstrip('src="').rstrip('" srcset"')
+    logging.warning(url)
+    i = fetch_image(url)
+    txt = f" [Source.](r.url)"
+    return i, txt

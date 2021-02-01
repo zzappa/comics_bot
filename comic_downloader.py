@@ -253,7 +253,7 @@ def get_pbf(link, latest=False):
     return None, txt
 
 
-def get_calvin_and_hobbes(link):
+def get_from_gocomics(link):
     r = requests.get(link)
     logging.warning(r.url)
     page = BeautifulSoup(r.text, "html5lib")
@@ -265,5 +265,5 @@ def get_calvin_and_hobbes(link):
     url = urls[0].lstrip('src="').rstrip('" srcset"')
     logging.warning(url)
     i = fetch_image(url)
-    txt = f" [Source.](r.url)"
+    txt = f"[Source.]({r.url})"
     return i, txt

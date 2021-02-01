@@ -109,7 +109,13 @@ def callback_worker(call):
                     bot.send_photo(call.message.chat.id, i, txt)
         _again()
     if call.data == "calvinandhobbes":
-        return_comic(call, codo.get_calvin_and_hobbes, links.calvinandhobbes_random)
+        return_comic(call, codo.get_from_gocomics, links.calvinandhobbes_random)
+        _again()
+    if call.data == "garfield":
+        return_comic(call, codo.get_from_gocomics, links.garfield_random)
+        _again()
+    if call.data == "pearlsbeforeswine":
+        return_comic(call, codo.get_from_gocomics, links.pearlsbeforeswine_random)
         _again()
     if call.data in ("again", "show_all"):
         bot.send_message(call.message.chat.id, 'Choose wisely!', reply_markup=keyboard)

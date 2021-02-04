@@ -1,9 +1,10 @@
+import datetime
+import logging
+import random
+from io import BytesIO
+
 import requests
 from PIL import Image
-from io import BytesIO
-import random
-import logging
-import datetime
 
 
 def get_random_date(start_year: int, start_month: int, start_day: int, format: str = '') -> str:

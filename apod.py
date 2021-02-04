@@ -1,9 +1,8 @@
+import logging
+from urllib.parse import urlparse
+
 import requests
 from bs4 import BeautifulSoup
-import random
-import logging
-import datetime
-from urllib.parse import urlparse
 
 from utils import get_random_date
 

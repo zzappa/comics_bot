@@ -1,16 +1,17 @@
-import random
-from datetime import datetime
-from dateutil import parser
-import feedparser
 import logging
-import schedule
+import random
 import time
+from datetime import datetime
 from threading import Thread
-import pytz
 
-import links
-import comic_downloader as codo
+import feedparser
+import pytz
+import schedule
+from dateutil import parser
+
 import apod
+import comic_downloader as codo
+import links
 from bot_init import bot, keyboard, keyboard_start, keyboard_small, keyboard_sub
 
 DEBUG = True

@@ -1,12 +1,13 @@
-import requests
-import re
-import html
-from bs4 import BeautifulSoup
-import random
-import logging
 import datetime
-import feedparser
+import html
+import logging
+import random
+import re
 from urllib.request import urlopen
+
+import feedparser
+import requests
+from bs4 import BeautifulSoup
 
 from links import smbc_latest
 from utils import get_random_date, fetch_image

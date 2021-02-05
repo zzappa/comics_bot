@@ -16,18 +16,17 @@ from utils import get_random_date, fetch_image
 def get_xkcd(link):
     r = requests.get(link)
     logging.warning(r.url)
+    src = f'[Source]({r.url}).'
     try:
-        urls_png = re.findall('https?://imgs.xkcd.com/.*png', r.text)
-        urls_jpg = re.findall('https?://imgs.xkcd.com/.*jpe?g', r.text)
-        url = urls_png[0] if urls_png else urls_jpg[0]
+        soup = BeautifulSoup(r.text, 'html5lib')
+        img_url = soup.find_all("img")
+        text = img_url[2]['title']
+        title = img_url[2]['alt']
+        url = 'https:' + (img_url[2]['srcset'].split(' '))[0]
         i = fetch_image(url)
+        txt = title + '\n' + text + '\n' + src
     except Exception:
         i = None
-    src = f' [Source]({r.url}).'
-    try:
-        txt = re.findall('{{Title.*}}', r.text)
-        txt = html.unescape(txt[0].lstrip('{{Title text:').rstrip('}}').lstrip('{{Title text: ').rstrip('}}')) + src
-    except Exception:
         txt = src
     return i, txt
 

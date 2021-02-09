@@ -6,3 +6,4 @@ pyTelegramBotAPI>=3.7.5
 feedparser>=6.0.2
 schedule>=0.6.0
 pytz>=2020.4
+lxml>=4.6.2

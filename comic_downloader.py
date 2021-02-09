@@ -4,6 +4,7 @@ import logging
 import random
 import re
 from urllib.request import urlopen
+from lxml import html as lxml_html
 
 import feedparser
 import requests
@@ -39,19 +40,28 @@ def get_goose(link):
     logging.warning(r.url)
     try:
         urls_strips = re.findall('https?://abstrusegoose.com/strips/.*png', r.text)
-        urls_images = re.findall('https?://abstrusegoose.com/images/.*png', r.text)
-        url = urls_strips[0] if urls_strips else urls_images[0]
+        url = urls_strips[0]
         i = fetch_image(url)
     except Exception:
         i = None
-    src = f' [Source]({r.url}).'
+    src = f'[Source]({r.url}).'
     try:
         soup = BeautifulSoup(r.text, 'html5lib')
         txt = soup.find("div", {"id": "blog_text"})
-        txt = html.unescape(str(txt).lstrip('<div id="blog_text"><p>\n<p>').rstrip('</p></div></p>\n')) + src
+        txt = html.unescape(str(txt).lstrip('<div id="blog_text"><p>\n<p>').rstrip('</p></div></p>\n'))
+        txt = str(lxml_html.fromstring(txt).text_content())
+        for item in ('r/>', 'align="center">', 'a href="', '" target="_blank"', 're>', 'm>', 'strong>', '/p>'):
+            txt = txt.replace(item, ' ')
+        txt = txt.replace('r/>', '') + "\n" + src
     except Exception:
         txt = src
-    return i, txt
+    try:
+        title = soup.find("h1", {"class": "storytitle"})
+        title = title.text
+    except Exception:
+        title = ''
+    text = title + '\n' + txt
+    return i, text
 
 
 def get_poorlydrawnlines(link):

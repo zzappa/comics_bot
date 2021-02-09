@@ -217,22 +217,24 @@ def get_new_yorker_cartoon(link):
         links.append(link)
     res = []
     for item in links:
-        caption = re.findall('<img alt=.*" class="responsive-image__image', str(item))[0].lstrip('<img alt="').rstrip(
-            ' class="responsive-image__image')
-        url = re.findall('class="responsive-image__image" sizes="100vw".* srcset=', str(item))[0].lstrip(
-            'class="responsive-image__image" sizes="100vw" src="').rstrip('" srcset=')
+        caption = re.findall('<img alt=.*" class="responsive-image__image', str(item))[0].\
+            lstrip('<img alt="').\
+            rstrip(' class="responsive-image__image')
+        url = re.findall('class="responsive-image__image" sizes="100vw".* srcset=', str(item))[0].\
+            lstrip('class="responsive-image__image" sizes="100vw" src="').\
+            rstrip('" srcset=')
         logging.warning(url)
         i = fetch_image(url)
         txt = html.unescape(caption)
         res.append((i, txt))
-    return res
+    return [item for item in res[:2]]
 
 
 def get_new_yorker_rss(link):
     rss_feed = feedparser.parse(link)
     logging.warning('checking rss')
     res = []
-    for item in rss_feed.entries[:2]:
+    for item in rss_feed.entries[:1]:
         url = item.link
         temp = get_new_yorker_cartoon(url)
         res.append(temp)
@@ -271,7 +273,7 @@ def get_from_gocomics(link):
     links = []
     for img in page.findAll("div", {'class': "comic__image js-comic-swipe-target"}):
         links.append(img)
-    urls = re.findall('src="https:\/\/assets\.amuniversal\.com.*srcset', str(links[0]))
+    urls = re.findall('src="https://assets\.amuniversal\.com.*srcset', str(links[0]))
     url = urls[0].lstrip('src="').rstrip('" srcset"')
     logging.warning(url)
     i = fetch_image(url)
